@@ -1,0 +1,24 @@
+name: daily-auto-commit
+on:
+  workflow_dispatch:   # 允许手动触发
+  schedule:
+    # 每天 UTC 00:00 执行一次（北京时间 08:00，想换时间改 cron）
+    - cron: '0 0 * * *'
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 生成 1~3 条空提交并推送
+        run: |
+          git config --local user.name "yujianwudi"
+          git config --local user.email "2068304112@qq.com"
+          # 随机 1~3
+          n=$(( $RANDOM % 3 + 1 ))
+          for i in $(seq 1 $n); do
+            git commit --allow-empty -m "daily empty commit #$i - $(date -u +%F\ %T)"
+          done
+          git push
